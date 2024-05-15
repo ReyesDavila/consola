@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+
+        <style>
+            body{
+                width: calc(100vw - 2px);
+                height: calc(100vh - 2px);
+                margin: 0px;
+                padding: 0px;
+                background-color: black;
+            }
+
+            #contenedor_textarea{
+                width: calc(100%);
+                height: calc(100% - 32px - 2px - 5px);
+                margin: 0px;
+                overflow: auto;
+                padding: 0px;
+            }
+
+            textarea{
+                margin: 0px;
+                padding: 10px;
+                border-style: none;
+                border-width: 1px;
+                padding-top: 32px;
+                padding-left: 32px;
+                background-color: rgb(14, 13, 22);
+                color: lime;
+                resize: none;
+
+                overflow: hidden;
+                white-space: nowrap;
+                min-width: calc(100% - 32px - 10px);
+                min-height: calc(100% - 32px - 4px - 10px);
+    
+            }
+
+            button{
+                border-radius: 5px;
+                color: lime;
+                background: rgb(16, 10, 27);
+                width: 64px;
+                height: 32px;
+                position: fixed;
+                bottom: 2px;
+                left: 2px;
+            }
+
+            #clear{
+                left: 68px;
+            }
+
+        </style>
+        <div id="contenedor_textarea">
+            <textarea spellcheck="false"></textarea>
+        </div>
+        <button onclick="runCode()">Run</button>
+        <button id="clear" onclick="limpiar()">Clear</button>
+
+        <script>
+
+
+
+        let textarea = document.getElementsByTagName('textarea')[0];
+        textarea.addEventListener('input', function() {ajustar_textarea();});
+
+        function ajustar_textarea(){
+            const content = textarea.value;
+            const lines = content.split('\n');
+            const longestLine = lines.reduce((max, line) => Math.max(max, line.length), 0);
+            const width = longestLine * 12; // Ancho por carácter
+            const lineHeight = 32*1.5; // Altura de cada línea (ajustar según sea necesario)
+            const height = lines.length * lineHeight; // Altura total
+
+            textarea.style.width = `${width}px`;
+            textarea.style.height = `${height}px`;
+        }
+
+
+        function f_ultimaPalabra(str) {
+           
+           // Eliminar los espacios en blanco en los bordes del str
+           str = str.trim();
+
+           // Buscar la última palabra desde el final del str
+           for (let i = str.length - 1; i >= 0; i--) {
+               const char = str[i];
+
+               // Si se encuentra un caracter no permitido, devolver la palabra anterior
+               if (char === ' ' || char === ';' || char === '}' || char === '\n') {
+               return str.slice(i + 1, str.length);
+               }
+           }
+
+           // Si no se encuentra ningún caracter no permitido, devolver la palabra completa
+           return str;
+       }
+
+
+        function runCode() {
+            if(textarea.value!="")
+            {
+                let ultimaPalabra = f_ultimaPalabra(textarea.value);
+                if(ultimaPalabra == "clear()")
+                {
+                    textarea.value = "";
+                    return
+                }
+
+                try {
+                let ultimo = ultimoCodigo(textarea.value);
+                result = eval(ultimo);
+                } catch (error) {
+                result = error.message;
+                }
+                result = result.toString();
+                textarea.value += "\n= "+result+"\n----------\n";
+            }
+            textarea.focus();
+        }
+
+        function ultimoCodigo(str) {
+            // Dividir el str en un arreglo con "::" como separador
+            const arr = str.split('----------');
+
+            // Si el arreglo tiene más de un elemento, devolver el último elemento
+            if (arr.length > 1) {
+                return arr[arr.length - 1];
+            } else {
+                // Si el arreglo tiene solo un elemento, devolver todo el str
+                return str;
+            }
+        }
+
+        function limpiar(){
+            textarea.value = "";
+            textarea.focus();
+        }
+        
+        </script>
+    </body>
+</html>
